@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mikael AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+background:#080a0f;
+color:#fff;
+height:100vh;
+overflow:hidden
+}
+.app{height:100vh;display:flex}
+.sidebar{
+width:260px;
+background:#0d1017;
+border-right:1px solid #202531;
+padding:18px;
+display:flex;
+flex-direction:column
+}
+.logo{
+font-size:21px;
+font-weight:800;
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:22px
+}
+.logoIcon{
+width:38px;height:38px;
+display:grid;place-items:center;
+border-radius:12px;
+background:linear-gradient(135deg,#7c5cff,#00c8ff)
+}
+.new{
+border:1px solid #252b37;
+background:#151a23;
+color:#fff;
+padding:12px;
+border-radius:12px;
+cursor:pointer;
+font-weight:600
+}
+.history{
+margin-top:25px;
+flex:1;
+overflow:auto
+}
+.historyTitle{
+font-size:11px;
+color:#697386;
+text-transform:uppercase;
+margin-bottom:10px
+}
+.historyItem{
+padding:10px;
+border-radius:9px;
+font-size:13px;
+color:#aeb7c7;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+cursor:pointer
+}
+.historyItem:hover{background:#171c25;color:#fff}
+.user{
+border-top:1px solid #202531;
+padding-top:14px;
+display:flex;
+gap:10px;
+align-items:center
+}
+.avatar{
+width:36px;height:36px;border-radius:50%;
+background:#202633;
+display:grid;place-items:center;font-weight:bold
+}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{
+height:64px;
+border-bottom:1px solid #202531;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 22px;
+background:#0b0e14
+}
+.status{display:flex;align-items:center;gap:8px;font-weight:700}
+.dot{
+width:8px;height:8px;border-radius:50%;
+background:#3dff8a;
+box-shadow:0 0 12px #3dff8a
+}
+.menu{
+display:none;
+border:0;background:none;color:#fff;
+font-size:24px
+}
+.chat{
+flex:1;
+overflow:auto;
+padding:30px 18px 130px
+}
+.inner{max-width:850px;margin:auto}
+.welcome{
+min-height:55vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center
+}
+.wicon{
+width:76px;height:76px;
+border-radius:24px;
+display:grid;place-items:center;
+font-size:31px;
+background:linear-gradient(135deg,#7c5cff,#00c8ff);
+box-shadow:0 20px 70px #0008;
+margin-bottom:20px
+}
+.welcome h1{
+font-size:38px;
+margin:0 0 10px;
+letter-spacing:-1px
+}
+.welcome p{
+color:#7d8798;
+line-height:1.6;
+max-width:560px
+}
+.suggestions{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+width:min(650px,100%);
+margin-top:25px
+}
+.suggestion{
+background:#10141c;
+border:1px solid #232a36;
+color:#cbd2df;
+border-radius:13px;
+padding:13px;
+text-align:left;
+cursor:pointer
+}
+.suggestion:hover{
+background:#171d27;
+border-color:#4e5b72
+}
+.message{
+display:flex;
+gap:11px;
+margin:24px 0;
+animation:in .2s ease
+}
+@keyframes in{
+from{opacity:0;transform:translateY(5px)}
+to{opacity:1;transform:translateY(0)}
+}
+.message.user{justify-content:flex-end}
+.msgAvatar{
+width:32px;height:32px;
+border-radius:10px;
+display:grid;place-items:center;
+flex-shrink:0;font-size:13px;font-weight:bold
+}
+.ai .msgAvatar{
+background:linear-gradient(135deg,#7c5cff,#00c8ff)
+}
+.user .msgAvatar{background:#202633}
+.bubble{
+max-width:min(720px,82%);
+line-height:1.65;
+font-size:15px
+}
+.user .bubble{
+background:#171d27;
+border:1px solid #252c38;
+padding:11px 14px;
+border-radius:16px
+}
+.ai .bubble{color:#dce2eb}
+.bubble pre{
+background:#07090d;
+border:1px solid #252b35;
+padding:14px;
+border-radius:12px;
+overflow:auto
+}
+.bubble code{
+font-family:monospace
+}
+.actions{
+display:flex;
+gap:10px;
+margin-top:8px
+}
+.action{
+border:0;background:none;color:#687386;
+cursor:pointer;font-size:12px
+}
+.action:hover{color:#fff}
+.inputArea{
+position:fixed;
+bottom:0;
+left:260px;
+right:0;
+padding:15px 18px 18px;
+background:linear-gradient(transparent,#080a0f 35%)
+}
+.inputBox{
+max-width:850px;
+margin:auto;
+display:flex;
+align-items:flex-end;
+gap:8px;
+background:#121720;
+border:1px solid #29303c;
+border-radius:18px;
+padding:8px 8px 8px 15px
+}
+textarea{
+flex:1;
+resize:none;
+border:0;
+outline:0;
+background:none;
+color:#fff;
+font:inherit;
+min-height:25px;
+max-height:150px;
+padding:7px 0
+}
+textarea::placeholder{color:#657084}
+.send{
+width:40px;height:40px;
+border:0;border-radius:12px;
+background:linear-gradient(135deg,#7c5cff,#5b8cff);
+color:#fff;font-size:18px;
+cursor:pointer
+}
+.send:disabled{opacity:.4}
+.typing{
+display:flex;gap:4px;padding:10px 0
+}
+.typing i{
+width:6px;height:6px;
+background:#788397;border-radius:50%;
+animation:t 1s infinite
+}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes t{
+0%,100%{opacity:.3;transform:translateY(0)}
+50%{opacity:1;transform:translateY(-3px)}
+}
+@media(max-width:760px){
+.sidebar{
+position:fixed;
+z-index:10;
+left:-280px;
+top:0;bottom:0;
+transition:.25s
+}
+.sidebar.open{left:0}
+.menu{display:block}
+.inputArea{left:0;padding:10px}
+.top{padding:0 15px}
+.chat{padding:20px 12px 115px}
+.welcome h1{font-size:30px}
+.suggestions{grid-template-columns:1fr}
+.bubble{max-width:88%}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar" id="sidebar">
+<div class="logo">
+<div class="logoIcon">✦</div>
+Mikael AI
+</div>
+
+<button class="new" onclick="newChat()">＋ New conversation</button>
+
+<div class="history">
+<div class="historyTitle">Recent chats</div>
+<div id="history"></div>
+</div>
+
+<div class="user">
+<div class="avatar">K</div>
+<div>
+<strong>Mikael</strong>
+<div style="font-size:12px;color:#687386">Personal AI</div>
+</div>
+</div>
+</aside>
+
+<main class="main">
+
+<header class="top">
+<button class="menu" onclick="toggleMenu()">☰</button>
+<div class="status"><span class="dot"></span> Mikael AI</div>
+<div style="font-size:12px;color:#687386">Gemini</div>
+</header>
+
+<section class="chat" id="chat">
+<div class="inner" id="inner">
+
+<div class="welcome" id="welcome">
+<div class="wicon">✦</div>
+<h1>How can I help?</h1>
+<p>
+Selamat datang di Mikael AI. Tanyakan apa saja,
+mulai dari coding, belajar, ide project, sampai
+pertanyaan sehari-hari.
+</p>
+
+<div class="suggestions">
+
+<button class="suggestion"
+onclick="promptAI('Bantu saya membuat website modern')">
+🌐 Buat website modern
+</button>
+
+<button class="suggestion"
+onclick="promptAI('Jelaskan cara kerja AI dengan sederhana')">
+🤖 Jelaskan AI
+</button>
+
+<button class="suggestion"
+onclick="promptAI('Bantu saya belajar programming dari awal')">
+💻 Belajar programming
+</button>
+
+<button class="suggestion"
+onclick="promptAI('Berikan saya ide project yang keren')">
+💡 Cari ide project
+</button>
+
+</div>
+</div>
+
+</div>
+</section>
+
+<div class="inputArea">
+<div class="inputBox">
+
+<textarea id="input"
+rows="1"
+placeholder="Message Mikael AI..."
+onkeydown="keyHandler(event)"></textarea>
+
+<button class="send" id="send" onclick="sendMessage()">↑</button>
+
+</div>
+
+<div style="
+text-align:center;
+font-size:10px;
+color:#505a6a;
+margin-top:7px">
+Mikael AI can make mistakes. Check important information.
+</div>
+</div>
+
+</main>
+</div>
+
+<script>
+
+const API_URL="/api/chat";
+
+let busy=false;
+let previousInteractionId=null;
+let messages=[];
+
+const input=document.getElementById("input");
+const send=document.getElementById("send");
+const inner=document.getElementById("inner");
+const chat=document.getElementById("chat");
+
+function esc(text){
+return String(text)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+}
+
+function md(text){
+
+let x=esc(text);
+
+x=x.replace(
+/```([\s\S]*?)```/g,
+(_,code)=>"<pre><code>"+code.trim()+"</code></pre>"
+);
+
+x=x.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
+x=x.replace(/`([^`]+)`/g,"<code>$1</code>");
+x=x.replace(/\n/g,"<br>");
+
+return x;
+}
+
+function addMessage(role,text){
+
+document.getElementById("welcome")?.remove();
+
+const el=document.createElement("div");
+
+el.className="message "+role;
+
+el.innerHTML=`
+<div class="msgAvatar">${role==="ai"?"✦":"K"}</div>
+<div class="bubble"></div>
+`;
+
+const bubble=el.querySelector(".bubble");
+
+if(role==="ai"){
+
+bubble.innerHTML=md(text);
+
+const actions=document.createElement("div");
+
+actions.className="actions";
+
+actions.innerHTML=`
+<button class="action" onclick="copyAnswer(this)">Copy</button>
+`;
+
+bubble.appendChild(actions);
+
+}else{
+
+bubble.textContent=text;
+
+}
+
+inner.appendChild(el);
+
+scroll();
+
+}
+
+function typing(){
+
+const el=document.createElement("div");
+
+el.className="message ai";
+el.id="typing";
+
+el.innerHTML=`
+<div class="msgAvatar">✦</div>
+<div class="bubble">
+<div class="typing">
+<i></i><i></i><i></i>
+</div>
+</div>
+`;
+
+inner.appendChild(el);
+
+scroll();
+}
+
+function scroll(){
+
+setTimeout(()=>{
+chat.scrollTo({
+top:chat.scrollHeight,
+behavior:"smooth"
+});
+},20);
+
+}
+
+async function sendMessage(){
+
+if(busy)return;
+
+const text=input.value.trim();
+
+if(!text)return;
+
+busy=true;
+send.disabled=true;
+
+input.value="";
+input.style.height="auto";
+
+messages.push({
+role:"user",
+content:text
+});
+
+addMessage("user",text);
+typing();
+
+try{
+
+const res=await fetch(API_URL,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+message:text,
+previousInteractionId
+})
+});
+
+const data=await res.json();
+
+document.getElementById("typing")?.remove();
+
+if(!res.ok || !data.success){
+
+throw new Error(
+data?.error || "Gagal mendapatkan jawaban."
+);
+
+}
+
+previousInteractionId=
+data.interactionId ||
+previousInteractionId;
+
+messages.push({
+role:"assistant",
+content:data.text
+});
+
+addMessage("ai",data.text);
+
+saveHistory(text);
+
+}catch(err){
+
+document.getElementById("typing")?.remove();
+
+addMessage(
+"ai",
+"⚠️ "+err.message
+);
+
+}finally{
+
+busy=false;
+send.disabled=false;
+input.focus();
+
+}
+
+}
+
+function keyHandler(e){
+
+if(e.key==="Enter"&&!e.shiftKey){
+
+e.preventDefault();
+sendMessage();
+
+}
+
+}
+
+input.addEventListener("input",()=>{
+
+input.style.height="auto";
+
+input.style.height=
+Math.min(input.scrollHeight,150)+"px";
+
+});
+
+function promptAI(text){
+
+input.value=text;
+input.focus();
+sendMessage();
+
+}
+
+function newChat(){
+
+messages=[];
+previousInteractionId=null;
+
+inner.innerHTML=`
+<div class="welcome" id="welcome">
+<div class="wicon">✦</div>
+<h1>How can I help?</h1>
+<p>Selamat datang di Mikael AI. Tanyakan apa saja.</p>
+<div class="suggestions">
+<button class="suggestion"
+onclick="promptAI('Bantu saya membuat website modern')">
+🌐 Buat website modern
+</button>
+<button class="suggestion"
+onclick="promptAI('Jelaskan cara kerja AI dengan sederhana')">
+🤖 Jelaskan AI
+</button>
+<button class="suggestion"
+onclick="promptAI('Bantu saya belajar programming')">
+💻 Belajar programming
+</button>
+<button class="suggestion"
+onclick="promptAI('Berikan saya ide project yang keren')">
+💡 Cari ide project
+</button>
+</div>
+</div>
+`;
+
+}
+
+function toggleMenu(){
+
+document
+.getElementById("sidebar")
+.classList.toggle("open");
+
+}
+
+async function copyAnswer(btn){
+
+const bubble=btn.closest(".bubble");
+
+const clone=bubble.cloneNode(true);
+
+clone.querySelector(".actions")?.remove();
+
+try{
+
+await navigator.clipboard.writeText(
+clone.innerText
+);
+
+btn.textContent="Copied!";
+
+setTimeout(()=>{
+btn.textContent="Copy";
+},1200);
+
+}catch{}
+
+}
+
+function saveHistory(text){
+
+let data=[];
+
+try{
+data=JSON.parse(
+localStorage.getItem("mikael_history")||"[]"
+);
+}catch{}
+
+data.unshift({
+text,
+time:Date.now()
+});
+
+data=data.slice(0,20);
+
+localStorage.setItem(
+"mikael_history",
+JSON.stringify(data)
+);
+
+renderHistory();
+
+}
+
+function renderHistory(){
+
+const list=document.getElementById("history");
+
+let data=[];
+
+try{
+data=JSON.parse(
+localStorage.getItem("mikael_history")||"[]"
+);
+}catch{}
+
+list.innerHTML="";
+
+data.forEach(item=>{
+
+const el=document.createElement("div");
+
+el.className="historyItem";
+el.textContent=item.text;
+
+el.onclick=()=>{
+input.value=item.text;
+input.focus();
+};
+
+list.appendChild(el);
+
+});
+
+}
+
+renderHistory();
+
+</script>
+</body>
+</html>

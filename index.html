@@ -524,14 +524,21 @@ previousInteractionId
 })
 });
 
-const data=await res.json();
+const raw=await res.text();
 
 document.getElementById("typing")?.remove();
+
+let data;
+try{
+data=JSON.parse(raw);
+}catch(e){
+throw new Error("HTTP "+res.status+" — Response: "+raw.slice(0,500));
+}
 
 if(!res.ok || !data.success){
 
 throw new Error(
-data?.error || "Gagal mendapatkan jawaban."
+"HTTP "+res.status+" — "+(data?.error || "Gagal mendapatkan jawaban.")
 );
 
 }
